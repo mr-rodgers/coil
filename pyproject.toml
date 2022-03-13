@@ -6,7 +6,9 @@ authors = [
     {name = "Te-jé Rodgers", email = "tjd.rodgers@gmail.com"},
 ]
 dependencies = [
-    "aiostream>=0.4.4"]
+    "aiostream>=0.4.4",
+    "pytest-cov>=3.0.0",
+]
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 
@@ -21,9 +23,9 @@ dev = [
     "pytest>=7.0.1",
     "pytest-asyncio>=0.18.2",
     "pre-commit>=2.17.0",
-]
+    "pytest-cov>=3.0.0"]
 [tool.pdm.scripts]
-tests = "pytest --doctest-modules"
+tests = "pytest --doctest-modules --cov coil/"
 typecheck = "mypy"
 post_install = "pre-commit install"
 
@@ -47,6 +49,9 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 norecursedirs = "__pypackages__"
 asyncio_mode = "strict"
+
+[tool.coverage.report]
+fail_under = 85
 
 [build-system]
 requires = ["pdm-pep517"]
