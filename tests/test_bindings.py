@@ -1,18 +1,20 @@
 import asyncio
 from typing import Any, AsyncIterable, List, cast
 
-
 import pytest
-from aiostream import stream, pipe
+from aiostream import pipe, stream
 
 from coil import bind
 from coil.protocols import Bindable
-from .conftest import Window, Size
+
+from .conftest import Size, Window
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("num_values", [100])
-async def test_bind_produces_result_stream(window: Window, num_values: int) -> None:
+async def test_bind_produces_result_stream(
+    window: Window, num_values: int
+) -> None:
     bound_value = bind((window, "size"))
     event_stream = stream.iterate(bound_value.events()) | pipe.take(num_values)
 
@@ -34,7 +36,9 @@ async def test_bind_produces_result_stream(window: Window, num_values: int) -> N
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("new_size", [Size(1920, 1080), Size(1280, 720)])
-async def test_setting_value_from_two_way_bind(window: Window, new_size: Size) -> None:
+async def test_setting_value_from_two_way_bind(
+    window: Window, new_size: Size
+) -> None:
     assert window.size != new_size
 
     bound_value = bind((cast(Bindable, window), "size"), readonly=False)

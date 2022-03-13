@@ -1,13 +1,12 @@
 import asyncio
 import contextlib
-
 from dataclasses import dataclass
 from typing import Any, AsyncIterator
 
 import pytest
 import pytest_asyncio
 
-from coil import bindableclass, BindableValue
+from coil import BindableValue, bindableclass
 
 
 @dataclass
@@ -30,7 +29,9 @@ def window() -> Window:
 async def cancel_running_tasks() -> AsyncIterator[Any]:
     yield
 
-    all_tasks = {task for task in asyncio.all_tasks() if task != asyncio.current_task()}
+    all_tasks = {
+        task for task in asyncio.all_tasks() if task != asyncio.current_task()
+    }
 
     for task in all_tasks:
         if not task.done():

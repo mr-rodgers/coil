@@ -1,7 +1,6 @@
 from typing import Dict, List, Protocol, Tuple, TypeAlias, runtime_checkable
 
-
-from .data_event_handler import DataEventHandler, DataEvent  # type: ignore
+from .data_event_handler import DataEvent, DataEventHandler  # type: ignore
 
 # why is type: ignore needed ???
 
@@ -47,7 +46,9 @@ def drop_subscription(bindable: Bindable, handle: SubscriptionHandle) -> None:
         raise LookupError(f"Invalid subscription: {handle}")
 
 
-def notify_subscribers(bindable: Bindable, prop: str, event: DataEvent) -> None:
+def notify_subscribers(
+    bindable: Bindable, prop: str, event: DataEvent
+) -> None:
     for receive in bindable.__coil_bindings__.get(prop, []):
         try:
             receive(event)

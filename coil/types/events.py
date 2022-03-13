@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, TypeAlias, TypedDict, Union, TypeGuard
 from collections.abc import Mapping
+from typing import Any, TypedDict, TypeGuard
 
 
 class DataEvent(TypedDict):
@@ -18,7 +18,9 @@ class DataDeletedEvent(DataEvent):
 
 def is_data_event(obj: Any) -> TypeGuard[DataEvent]:
     """Check whether an object is a data event."""
-    return isinstance(obj, Mapping) and {"source", "value"}.issuperset(obj.keys())
+    return isinstance(obj, Mapping) and {"source", "value"}.issuperset(
+        obj.keys()
+    )
 
 
 def is_delete_event(obj: Any) -> TypeGuard[DataDeletedEvent]:

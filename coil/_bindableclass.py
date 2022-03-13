@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-import asyncio
-import contextlib
-from ctypes import Union
 from dataclasses import dataclass, fields
-from typing import Any, Literal, Optional, Type, TypeVar, Generic, overload
+from typing import Any, Generic, Literal, TypeVar, overload
 
 from coil.protocols.bound import Bound, TwoWayBound
 
-
-from .bindings import Binding, bind
-from .types.events import DataDeletedEvent, DataUpdatedEvent
+from .bindings import bind
 from .protocols import Bindable, notify_subscribers
+from .types.events import DataDeletedEvent, DataUpdatedEvent
 from .utils import bound_attr_name
 
 T = TypeVar("T", bound=type)
@@ -63,7 +59,9 @@ class BindableValue(Generic[V]):
 
     def __set__(self, obj: Bindable, value: V) -> None:
         setattr(obj, self.private_name, value)
-        notify_subscribers(obj, self.name, DataUpdatedEvent(source=None, value=value))
+        notify_subscribers(
+            obj, self.name, DataUpdatedEvent(source=None, value=value)
+        )
 
     def __delete__(self, obj: Bindable) -> None:
         delattr(obj, self.private_name)
@@ -83,49 +81,3 @@ class BindableValue(Generic[V]):
     @property
     def private_name(self) -> str:
         return bound_attr_name(self.name)
-
-
-@bindableclass
-class Foo:
-    val: int
-
-
-async def seed_val(f: Foo):
-    for i in range(10):
-        f.val = i
-        # await asyncio.sleep(1)
-
-
-async def stream_values(f: Foo):
-    from coil.bindings import bind
-
-    async for event in bind((f, "val")).events():
-        print(event)
-
-
-async def main():
-    from coil.bindings import bind
-
-    f = Foo(50)
-    g = Foo(50)
-
-    # tail(bind((f, "val")), into=bind((g, "val")))
-
-    stream_task = asyncio.create_task(stream_values(f))
-    seed_task = asyncio.create_task(seed_val(f))
-
-    done, pending = await asyncio.wait(
-        (seed_task, stream_task), return_when=asyncio.FIRST_COMPLETED
-    )
-
-    await asyncio.gather(*done)
-
-    for task in pending:
-        task.cancel()
-
-    with contextlib.suppress(asyncio.CancelledError):
-        await asyncio.gather(*pending)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

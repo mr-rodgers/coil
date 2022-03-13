@@ -1,5 +1,6 @@
 import pytest
-from coil import bindableclass, BindableValue
+
+from coil import BindableValue, bindableclass
 from coil.protocols import Bindable
 
 

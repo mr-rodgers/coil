@@ -3,7 +3,6 @@ from typing import Any
 
 from aiostream import stream
 
-
 from coil.protocols import Bound, ReverseBound
 
 

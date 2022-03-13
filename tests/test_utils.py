@@ -1,12 +1,11 @@
 import asyncio
-import contextlib
 
 import pytest
 
 from coil import bind
 from coil.utils import tail
 
-from .conftest import Window, Size
+from .conftest import Size, Window
 
 
 @pytest.mark.asyncio

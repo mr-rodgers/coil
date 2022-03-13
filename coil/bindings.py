@@ -1,11 +1,6 @@
 import asyncio
-import contextlib
 from dataclasses import dataclass
-from email.generator import Generator
-from typing import Any, AsyncGenerator, AsyncIterable, Literal, Tuple, overload
-
-from coil.protocols.bindable import notify_subscribers
-from coil.types.events import DataDeletedEvent
+from typing import Any, AsyncIterable, Literal, Tuple, overload
 
 from .protocols import (
     Bindable,
@@ -15,7 +10,12 @@ from .protocols import (
     drop_subscription,
     notify_subscribers,
 )
-from .types import DataEvent, DataUpdatedEvent, is_update_event
+from .types import (
+    DataDeletedEvent,
+    DataEvent,
+    DataUpdatedEvent,
+    is_update_event,
+)
 from .utils import bound_attr_name
 
 
@@ -71,12 +71,16 @@ class BindingEventStream:
 
 
 @overload
-def bind(target: Tuple[Bindable, str], *, readonly: Literal[True] = True) -> Bound:
+def bind(
+    target: Tuple[Bindable, str], *, readonly: Literal[True] = True
+) -> Bound:
     pass
 
 
 @overload
-def bind(target: Tuple[Bindable, str], *, readonly: Literal[False]) -> TwoWayBound:
+def bind(
+    target: Tuple[Bindable, str], *, readonly: Literal[False]
+) -> TwoWayBound:
     pass
 
 
