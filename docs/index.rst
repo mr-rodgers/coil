@@ -10,7 +10,8 @@ Usage
 -----
 
 coil allows data bindings through a special type of class that is able
-to record changes to its properties. coil's included :func:`bindableclass`
+to record changes to its properties. coil's included
+:func:`@bindableclass <coil.bindableclass>`
 decorator can be used to declare such a class::
 
    from coil import bindableclass
@@ -47,6 +48,22 @@ Do be aware that the async iterator returned from :code:`events()` will run
 indefinitely (or, until the bound value is deleted). For this reason,
 this stream should be consumed *in parallel* to application code.
 
+
+Capabilities
+------------
+- Generate asynchronous :meth:`event streams <coil.protocols.Bound.events>`
+  from changes made to a :func:`bound value <coil.bind>` over time.
+- Chain binding properties together, by tailing changes from one property into
+  another.
+
+
+Roadmap
+-------
+- Bi-directional data binding (:issue:`1`)
+- Nicer syntax for data binding (:issue:`1`)
+- Composite bindings
+- Bindings using a callback function (smart enough to track which props they access, and
+  refire when any of those previously accessed props changed)
 
 .. toctree::
    :maxdepth: 2

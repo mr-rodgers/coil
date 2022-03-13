@@ -31,7 +31,7 @@ release = "0.1.0"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinx_issues"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -56,3 +56,6 @@ html_static_path = ["_static"]
 
 # Intersphinx options
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+
+# sphinx_issues
+issues_github_path = "mr-rodgers/coil"
