@@ -1,7 +1,7 @@
 [project]
 name = "coil"
 version = "0.1.0"
-description = ""
+description = "A data-binding library for Python asyncio."
 authors = [
     {name = "Te-jé Rodgers", email = "tjd.rodgers@gmail.com"},
 ]
@@ -23,10 +23,13 @@ dev = [
     "pytest>=7.0.1",
     "pytest-asyncio>=0.18.2",
     "pre-commit>=2.17.0",
-    "pytest-cov>=3.0.0"]
+    "pytest-cov>=3.0.0",
+    "sphinx>=4.4.0",
+]
 [tool.pdm.scripts]
 tests = "pytest --doctest-modules --cov coil/"
 typecheck = "mypy"
+docs-build = "sphinx-build -M html docs docs/_build"
 post_install = "pre-commit install"
 
 [tool.black]

@@ -12,6 +12,10 @@ SubscriptionHandle: TypeAlias = Tuple[str, int]
 class Bindable(Protocol):
     """An object which can notify subscribers about changes to its
     properties.
+
+    This protocol is implemented by any class that is decorated
+    with :func:`bindableclass <coil.bindableclass>` (even though
+    this currently fails mypy typecheck).
     """
 
     @property

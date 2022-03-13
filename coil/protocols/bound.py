@@ -8,7 +8,7 @@ from ..types.events import DataEvent, DataUpdatedEvent
 
 
 class Bound(Protocol):
-    """An abstraction of bound readable values."""
+    """An abstraction of a readable bound value."""
 
     def events(self) -> AsyncIterable[DataUpdatedEvent]:
         """Return an asynchronous stream of value change events.
@@ -18,6 +18,8 @@ class Bound(Protocol):
 
 
 class ReverseBound(Protocol):
+    """An abstraction of a settable bound value."""
+
     def set(
         self, value: Any, source: DataEvent | None = None
     ) -> Awaitable[None]:
@@ -25,4 +27,6 @@ class ReverseBound(Protocol):
 
 
 class TwoWayBound(Bound, ReverseBound, Protocol):
+    """A combination of :class:`Bound` and :class:`ReverseBound`."""
+
     pass
