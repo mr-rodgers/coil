@@ -19,3 +19,4 @@ coil.
 
 .. autoclass:: Runtime
     :members: register, forget, find
+    :member-order: bysource

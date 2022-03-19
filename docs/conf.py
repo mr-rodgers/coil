@@ -59,3 +59,5 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 # sphinx_issues
 issues_github_path = "mr-rodgers/coil"
+
+autodoc_typehints_format = "short"
