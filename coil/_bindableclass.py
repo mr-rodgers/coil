@@ -3,12 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from typing import Any, Generic, Literal, TypeVar, overload
 
-from coil.protocols.bound import Bound, TwoWayBound
+from coil.protocols._bound import Bound, TwoWayBound
 
-from .bindings import bind
-from .protocols import Bindable, notify_subscribers
+from ._bindings import bind
+from ._core import bound_attr_name, notify_subscribers
+from .protocols import Bindable
 from .types.events import DataDeletedEvent, DataUpdatedEvent
-from .utils import bound_attr_name
 
 T = TypeVar("T", bound=type)
 V = TypeVar("V")
@@ -63,10 +63,10 @@ class BindableValue(Generic[V]):
         ... class Box:
         ...     value: Any
         ...
-        >>> box = Box(value="foo")
+        >>> box = Box(value=1)
         >>> bound_value = Box.value.bind(box)
         >>> bound_value.events()
-        <coil.bindings.BindingEventStream object ...>
+        <BindingEventStream bindable=Box(value=1), prop='value'>
     """
 
     def __init__(self, name: str):

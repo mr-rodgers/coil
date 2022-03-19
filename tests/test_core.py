@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from coil import bind
-from coil.utils import tail
+from coil._core import tail
 
 from .conftest import Size, Window
 

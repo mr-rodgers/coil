@@ -2,21 +2,19 @@ import asyncio
 from dataclasses import dataclass
 from typing import Any, AsyncIterable, Literal, Tuple, overload
 
-from .protocols import (
-    Bindable,
-    Bound,
-    TwoWayBound,
+from ._core import (
     add_subscription,
+    bound_attr_name,
     drop_subscription,
     notify_subscribers,
 )
+from .protocols import Bindable, Bound, TwoWayBound
 from .types import (
     DataDeletedEvent,
     DataEvent,
     DataUpdatedEvent,
     is_update_event,
 )
-from .utils import bound_attr_name
 
 
 @dataclass
@@ -65,6 +63,13 @@ class BindingEventStream:
 
         else:
             raise StopAsyncIteration
+
+    def __repr__(self) -> str:
+        return (
+            "<BindingEventStream "
+            f"bindable={repr(self.binding.host)}, "
+            f"prop={repr(self.binding.prop)}>"
+        )
 
     def _handle_event(self, data_event: DataEvent) -> None:
         self.new_data.put_nowait(data_event)

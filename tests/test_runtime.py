@@ -5,7 +5,7 @@ from typing import Any, AsyncIterator, Callable
 import pytest
 import pytest_asyncio
 
-from coil.runtime import Runtime, runtime
+from coil._runtime import Runtime, runtime
 from tests.conftest import Box
 
 TaskFactory = Callable[[], asyncio.Task[Any]]

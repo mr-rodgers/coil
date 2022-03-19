@@ -1,26 +1,16 @@
-from typing import Dict, List, Protocol, Tuple, TypeAlias, runtime_checkable
+import asyncio
+from typing import Any, Tuple, TypeAlias
 
-from .data_event_handler import DataEvent, DataEventHandler  # type: ignore
+from aiostream import stream
 
-# why is type: ignore needed ???
-
+from coil.protocols import Bindable, Bound, DataEventHandler, ReverseBound
+from coil.types import DataEvent
 
 SubscriptionHandle: TypeAlias = Tuple[str, int]
 
 
-@runtime_checkable
-class Bindable(Protocol):
-    """An object which can notify subscribers about changes to its
-    properties.
-
-    This protocol is implemented by any class that is decorated
-    with :func:`bindableclass <coil.bindableclass>` (even though
-    this currently fails mypy typecheck).
-    """
-
-    @property
-    def __coil_bindings__(self) -> Dict[str, List[DataEventHandler]]:
-        """Return a mapping of subscribers"""
+def bound_attr_name(name: str) -> str:
+    return f"_bound__value__{name}"
 
 
 def add_subscription(
@@ -58,3 +48,24 @@ def notify_subscribers(
             receive(event)
         except Exception:
             continue
+
+
+def tail(bound: Bound, *, into: ReverseBound) -> asyncio.Task[None]:
+    """Forward all changes from a bound value into another.
+
+    :param bound: a bound value from which changes can be streamed.
+    :param into: a bound value into which changes can be sent.
+
+    This function returns a cancellable asyncio.Task, which will
+    keep running until the bound value is deleted from the host (if ever).
+    """
+    events_stream = stream.iterate(bound.events())
+    return asyncio.create_task(_tail(events_stream, into))
+
+
+async def _tail(events_stream: Any, into: ReverseBound) -> None:
+    async with events_stream.stream() as streamer:
+        async for event in streamer:
+            await into.set(event["value"], source=event)
+
+        # fixme: if the stream is exhausted, the field was deleted
