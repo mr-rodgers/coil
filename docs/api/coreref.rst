@@ -15,7 +15,8 @@ coil.
 
     .. automethod:: bind
 
-.. autofunction:: runtime(*, ensure: bool = True) -> coil.Runtime
+.. autofunction:: runtime
 
 .. autoclass:: Runtime
     :members: register, forget, find
+    :member-order: bysource

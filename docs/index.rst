@@ -65,15 +65,23 @@ Roadmap
 - Bindings using a callback function (smart enough to track which props they access, and
   refire when any of those previously accessed props changed)
 
+
+API Reference
+-------------
+
+In the API reference, you will find API docs for all public
+functions and classes within coil. They are broken down as follows:
+
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
-   api/index
+   api/coreref
+   api/protocols
+   api/types
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

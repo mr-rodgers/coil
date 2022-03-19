@@ -1,8 +1,10 @@
 # coil
 
-[Docs](https://mr-rodgers.github.io/coil/)
+[![Documentation Status](https://readthedocs.org/projects/coil-bindings/badge/?version=latest)](https://coil-bindings.readthedocs.io/en/latest/?badge=latest)
 
-#### Usage
+Documentation is available at [https://coil-bindings.readthedocs.io/](https://coil-bindings.readthedocs.io/)
+
+## Usage
 
 ```python
 from coil import bindableclass
