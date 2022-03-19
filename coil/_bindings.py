@@ -18,13 +18,18 @@ from .types import (
 
 
 @dataclass
-class Binding(TwoWayBound):
+class Binding(Bound):
     host: Bindable
     prop: str
 
     def events(self) -> AsyncIterable[DataUpdatedEvent]:
         return BindingEventStream(self)
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({repr(self.host)}.{self.prop})"
+
+
+class TwoWayBinding(TwoWayBound, Binding):
     async def set(self, value: Any, source: DataEvent | None = None) -> None:
         setattr(self.host, bound_attr_name(self.prop), value)
         event = DataUpdatedEvent(source=source, value=value)
@@ -34,9 +39,6 @@ class Binding(TwoWayBound):
         delattr(self.host, bound_attr_name(self.prop))
         event = DataDeletedEvent(source=None)
         notify_subscribers(self.host, self.prop, event)
-
-    def __repr__(self) -> str:
-        return f"BoundValue({repr(self.host)}.{self.prop})"
 
 
 class BindingEventStream:
@@ -101,4 +103,4 @@ def bind(target: Tuple[Bindable, str], *, readonly: bool = True) -> Any:
       be used to set the bound value.
     """
     (host, prop) = target
-    return Binding(host, prop)
+    return Binding(host, prop) if readonly else TwoWayBinding(host, prop)

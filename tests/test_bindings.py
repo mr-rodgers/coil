@@ -1,11 +1,11 @@
 import asyncio
-from typing import Any, AsyncIterable, List, cast
+from typing import Any, AsyncIterable, List, Tuple, cast
 
 import pytest
 from aiostream import pipe, stream
 
 from coil import bind
-from coil.protocols import Bindable
+from coil.protocols import Bindable, Bound, TwoWayBound
 
 from .conftest import Size, Window
 
@@ -45,3 +45,20 @@ async def test_setting_value_from_two_way_bind(
     await bound_value.set(new_size)
 
     assert window.size == new_size
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "bindargs",
+    [
+        (pytest.lazy_fixture("box"), "value"),
+        (pytest.lazy_fixture("window"), "size"),
+    ],
+)
+async def test_binding_types(bindargs: Tuple[Bindable, str]) -> None:
+    assert isinstance(bind(bindargs), Bound)
+    assert not isinstance(bind(bindargs), TwoWayBound)
+    assert isinstance(bind(bindargs, readonly=True), Bound)
+    assert not isinstance(bind(bindargs, readonly=True), TwoWayBound)
+    assert isinstance(bind(bindargs, readonly=False), Bound)
+    assert isinstance(bind(bindargs, readonly=False), TwoWayBound)

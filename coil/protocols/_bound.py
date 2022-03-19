@@ -2,11 +2,12 @@
 Protocol for bound values.
 """
 
-from typing import Any, AsyncIterable, Awaitable, Protocol
+from typing import Any, AsyncIterable, Awaitable, Protocol, runtime_checkable
 
 from ..types.events import DataEvent, DataUpdatedEvent
 
 
+@runtime_checkable
 class Bound(Protocol):
     """An abstraction of a readable bound value."""
 
@@ -17,6 +18,7 @@ class Bound(Protocol):
         """
 
 
+@runtime_checkable
 class ReverseBound(Protocol):
     """An abstraction of a settable bound value."""
 
@@ -26,6 +28,7 @@ class ReverseBound(Protocol):
         """Push a value into the binding."""
 
 
+@runtime_checkable
 class TwoWayBound(Bound, ReverseBound, Protocol):
     """A combination of :class:`Bound` and :class:`ReverseBound`."""
 
