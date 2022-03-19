@@ -20,9 +20,19 @@ class Window:
     size: BindableValue[Size] = Size(1024, 768)
 
 
+@bindableclass
+class Box:
+    value: int
+
+
 @pytest.fixture
 def window() -> Window:
     return Window()
+
+
+@pytest.fixture
+def box() -> Box:
+    return Box(10)
 
 
 @pytest_asyncio.fixture(autouse=True)
