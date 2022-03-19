@@ -14,3 +14,8 @@ coil.
 .. autoclass:: BindableValue(...)
 
     .. automethod:: bind
+
+.. autofunction:: runtime(*, ensure: bool = True) -> coil.Runtime
+
+.. autoclass:: Runtime
+    :members: register, forget, find
