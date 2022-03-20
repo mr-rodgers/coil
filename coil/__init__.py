@@ -1,6 +1,6 @@
 from ._bindableclass import BindableValue, bindableclass
-from .bindings import Binding, bind
-from .runtime import Runtime, runtime
+from ._bindings import Binding, bind
+from ._runtime import Runtime, runtime
 
 __all__ = [
     "bind",

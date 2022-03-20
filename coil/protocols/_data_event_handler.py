@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from ..types.events import DataEvent
+from ..types import DataEvent
 
 
 class DataEventHandler(Protocol):

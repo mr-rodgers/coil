@@ -18,5 +18,5 @@ coil.
 .. autofunction:: runtime
 
 .. autoclass:: Runtime
-    :members: register, forget, find
+    :members: register, forget, find, evict
     :member-order: bysource

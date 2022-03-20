@@ -22,7 +22,10 @@ class Window:
 
 @bindableclass
 class Box:
-    value: int
+    value: BindableValue[int]
+
+    def __repr__(self) -> str:
+        return f"<Box object: {id(self)}>"
 
 
 @pytest.fixture
