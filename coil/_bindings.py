@@ -28,7 +28,7 @@ class Binding(Bound):
         return BindingEventStream(self)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self.host)}.{self.prop})"
+        return f"Binding({repr(self.host)}, {repr(self.prop)})"
 
     @property
     def host(self) -> Bindable:
@@ -39,7 +39,7 @@ class Binding(Bound):
         return self.__prop
 
 
-class TwoWayBinding(Binding, Bound):
+class TwoWayBinding(Binding, TwoWayBound):
     async def set(
         self, value: Any, source_event: DataEvent | None = None
     ) -> None:

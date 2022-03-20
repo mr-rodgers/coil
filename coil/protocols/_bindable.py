@@ -1,4 +1,4 @@
-from typing import Dict, List, Protocol, runtime_checkable
+from typing import Any, Dict, List, Protocol, runtime_checkable
 
 from ._data_event_handler import DataEventHandler
 
@@ -28,3 +28,8 @@ class BindingTarget(Protocol):
     @property
     def prop(self) -> str:
         """The name of the property"""
+
+    @property
+    def current(self) -> Any:
+        """Retrieve the current value of the binding target."""
+        return getattr(self.host, self.prop)

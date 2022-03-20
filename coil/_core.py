@@ -46,6 +46,7 @@ def drop_subscription(bindable: Bindable, handle: SubscriptionHandle) -> None:
 def notify_subscribers(
     bindable: Bindable, prop: str, event: DataEvent
 ) -> None:
+
     if _is_cyclic_trigger(event):
         LOG.warning(
             "Event has a cyclic trigger. "
@@ -61,17 +62,21 @@ def notify_subscribers(
 
 
 def _is_cyclic_trigger(event: DataEvent) -> bool:
-    orig_source_obj = (event["source"].host, event["source"].prop)
+    orig_source_obj = (id(event["source"].host), event["source"].prop)
     orig_event_type = get_event_type(event)
+
+    LOG.debug(f"Starting search for event with source: {orig_source_obj}")
 
     while event["source_event"] is not None:
         event = event["source_event"]
         if (
-            orig_source_obj == (event["source"].host, event["source"].prop)
+            orig_source_obj == (id(event["source"].host), event["source"].prop)
             and get_event_type(event) == orig_event_type
         ):
+            LOG.debug(f"Found: \n{pformat(event)}")
             return True
     else:
+        LOG.debug("Not found.")
         return False
 
 

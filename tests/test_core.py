@@ -83,7 +83,12 @@ async def test_cyclic_events_are_not_notified(
     assert mock.call_count == 0
 
     last_coil_record = next(
-        (record for record in caplog.records if record.name == "coil"), None
+        (
+            record
+            for record in reversed(caplog.records)
+            if record.name == "coil"
+        ),
+        None,
     )
     assert last_coil_record is not None
     assert last_coil_record.levelname == "WARNING"

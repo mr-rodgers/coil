@@ -105,6 +105,9 @@ async def test_forgotten_tasks_not_cancelled_on_context_exit(
         rt.register(task1, "foo")
         rt.register(task2, "bar", source=(box, "value"))
 
+        for i in range(10):
+            await asyncio.sleep(0)
+
         assert not task1.done()
         assert not task2.done()
 
@@ -113,6 +116,27 @@ async def test_forgotten_tasks_not_cancelled_on_context_exit(
 
     assert not task1.done()
     assert not task2.done()
+
+
+@pytest.mark.asyncio
+async def test_evicted_tasks_are_eventually_cancelled(
+    box: Box, task_factory: TaskFactory
+) -> None:
+    task1 = task_factory()
+    task2 = task_factory()
+
+    async with runtime() as rt:
+        rt.register(task1, "foo")
+        rt.register(task2, "bar", source=(box, "value"))
+
+        rt.evict("foo")
+        rt.evict("bar", source=(box, "value"))
+
+        for i in range(10):
+            await asyncio.sleep(0)
+
+        assert task1.done() and task1.cancelled()
+        assert task2.done() and task2.cancelled()
 
 
 @pytest.mark.asyncio

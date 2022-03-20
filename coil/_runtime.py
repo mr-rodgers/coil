@@ -1,4 +1,5 @@
-from asyncio import CancelledError, Task, gather
+from asyncio import CancelledError, Queue, Task, create_task, gather
+from asyncio import sleep as async_sleep
 from contextlib import suppress
 from contextvars import ContextVar
 from logging import getLogger
@@ -27,6 +28,11 @@ class Runtime:
         self.__tasks = {}
         self.__registry[id(self)] = self
         self.__reset_token = current_runtime.set(self)
+        self.__pending_cleanups = Queue[Task[Any] | None]()
+
+        # register a task for cleaning up the evicted
+        # tasks from the runtime.
+        self.register(create_task(self.__drain_pending_cleanups()), "")
         return self
 
     async def __aexit__(
@@ -37,22 +43,15 @@ class Runtime:
     ) -> None:
         self.__registry.pop(id(self))
         current_runtime.reset(self.__reset_token)
+        self.__pending_cleanups.put_nowait(None)
+
+        while not self.__pending_cleanups.empty():
+            await async_sleep(0)
 
         tasks = [task for task in self.__tasks.values()]
         del self.__tasks
 
-        meta_task = gather(*tasks, return_exceptions=True)
-        meta_task.cancel()
-
-        with suppress(CancelledError):
-            results = await meta_task
-
-            for result in results:
-                if isinstance(result, Exception):
-                    LOG.error(
-                        "Unhandled exception in registered task:",
-                        exc_info=(type(result), result, result.__traceback__),
-                    )
+        await self.__cleanup(*tasks)
 
     def register(
         self, task: Task[Any], id: str, *, source: BindingMeta | None = None
@@ -84,6 +83,26 @@ class Runtime:
         task_key = self.__get_task_key(id, source)
         return self.__tasks.get(task_key)
 
+    def evict(self, id: str, *, source: BindingMeta | None = None) -> None:
+        """Forget and (eventually) cancel a registered task.
+
+        This method first tries to find a registered task using the
+        given search parameters. If one is found, then it is
+        :meth:`forgotten <forget>` and then scheduled for cancellation.
+        (Note: cancellation is not immediate and will occur asynchronously;
+        if you need to await cancellation, then use a combination of
+        :meth:`find` and :meth:`forget`, while managing the cancellation
+        yourself.)
+
+        If no task is found matching the search parameters, this function
+        does nothing.
+        """
+        task = self.find(id, source=source)
+
+        if task is not None:
+            self.forget(task)
+            self.__pending_cleanups.put_nowait(task)
+
     def forget(self, task: Task[Any]) -> None:
         """Purge a given task from the internal registry."""
         self.__tasks = {
@@ -97,6 +116,35 @@ class Runtime:
             else (_id, id(_source[0]), _source[1])
         )
 
+    async def __drain_pending_cleanups(self) -> None:
+        # internal runtime task for cancelling and cleaning up
+        # evicted tasks
+        while True:
+            next_task = await self.__pending_cleanups.get()
+
+            if next_task is None:
+                # stop requested
+                break
+
+            await self.__cleanup(next_task)
+
+    async def __cleanup(self, *tasks: Task[Any]) -> None:
+        # cancel all the given tasks and await them.
+        # if there are any exceptions, log them.
+
+        meta_task = gather(*tasks, return_exceptions=True)
+        meta_task.cancel()
+
+        with suppress(CancelledError):
+            results = await meta_task
+
+            for result in results:
+                if isinstance(result, Exception):
+                    LOG.error(
+                        "Unhandled exception in registered task:",
+                        exc_info=(type(result), result, result.__traceback__),
+                    )
+
 
 def runtime(*, ensure: bool = True) -> Runtime:
     """Retrieve the currently active :class:`Runtime`.
@@ -108,6 +156,10 @@ def runtime(*, ensure: bool = True) -> Runtime:
 
     If `ensure=False` (default) and no runtime is currently
     active, then this raises a `RuntimeError`.
+
+    Most applications will only need just one active runtime
+    context, so it's best to use this function to wrap your
+    application code at startup
 
     Example::
 
