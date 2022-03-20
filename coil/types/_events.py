@@ -44,11 +44,15 @@ class DataDeletedEvent(DataEvent):
 
 def is_data_event(obj: Any) -> TypeGuard[DataEvent]:
     """Check whether an object is a data event."""
-    return isinstance(obj, Mapping) and {
-        "source_event",
-        "source",
-        "value",
-    }.issuperset(obj.keys())
+    return (
+        isinstance(obj, Mapping)
+        and "source" in obj
+        and {
+            "source_event",
+            "source",
+            "value",
+        }.issuperset(obj.keys())
+    )
 
 
 def is_delete_event(obj: Any) -> TypeGuard[DataDeletedEvent]:
