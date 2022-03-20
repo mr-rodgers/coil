@@ -18,6 +18,8 @@ async def test_bind_produces_result_stream(
     bound_value = bind((window, "size"))
     event_stream = stream.iterate(bound_value.events()) | pipe.take(num_values)
 
+    await asyncio.sleep(0)
+
     sent_sizes = []
 
     async def drain(s: AsyncIterable[Any]) -> List[Any]:

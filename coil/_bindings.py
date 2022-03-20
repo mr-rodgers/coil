@@ -1,5 +1,5 @@
 import asyncio
-from dataclasses import dataclass
+from logging import getLogger
 from typing import Any, AsyncIterable, Literal, Tuple, overload
 
 from ._core import (
@@ -16,11 +16,13 @@ from .types import (
     is_update_event,
 )
 
+LOG = getLogger("coil")
 
-@dataclass
+
 class Binding(Bound):
-    host: Bindable
-    prop: str
+    def __init__(self, host: Bindable, prop: str) -> None:
+        self.__host = host
+        self.__prop = prop
 
     def events(self) -> AsyncIterable[DataUpdatedEvent]:
         return BindingEventStream(self)
@@ -28,16 +30,28 @@ class Binding(Bound):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.host)}.{self.prop})"
 
+    @property
+    def host(self) -> Bindable:
+        return self.__host
 
-class TwoWayBinding(TwoWayBound, Binding):
-    async def set(self, value: Any, source: DataEvent | None = None) -> None:
+    @property
+    def prop(self) -> str:
+        return self.__prop
+
+
+class TwoWayBinding(Binding, Bound):
+    async def set(
+        self, value: Any, source_event: DataEvent | None = None
+    ) -> None:
         setattr(self.host, bound_attr_name(self.prop), value)
-        event = DataUpdatedEvent(source=source, value=value)
+        event = DataUpdatedEvent(
+            source_event=source_event, value=value, source=self
+        )
         notify_subscribers(self.host, self.prop, event)
 
-    async def unset(self) -> None:
+    async def unset(self, source_event: DataEvent | None = None) -> None:
         delattr(self.host, bound_attr_name(self.prop))
-        event = DataDeletedEvent(source=None)
+        event = DataDeletedEvent(source_event=source_event, source=self)
         notify_subscribers(self.host, self.prop, event)
 
 
@@ -50,14 +64,17 @@ class BindingEventStream:
         self.subsciption_handle = add_subscription(
             binding.host, binding.prop, self._handle_event
         )
+        LOG.debug(f"initialized binding event stream: {self}")
 
     def __del__(self) -> None:
+        LOG.debug(f"finalizing binding event stream: {self}")
         drop_subscription(self.binding.host, self.subsciption_handle)
 
     def __aiter__(self) -> Any:
         return self
 
     async def __anext__(self) -> DataUpdatedEvent:
+        LOG.debug("getting next event from queue")
         event = await self.new_data.get()
 
         if is_update_event(event):
@@ -74,6 +91,7 @@ class BindingEventStream:
         )
 
     def _handle_event(self, data_event: DataEvent) -> None:
+        LOG.debug("pushing next event into queue")
         self.new_data.put_nowait(data_event)
 
 

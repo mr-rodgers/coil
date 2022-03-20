@@ -4,11 +4,12 @@ Protocol for bound values.
 
 from typing import Any, AsyncIterable, Awaitable, Protocol, runtime_checkable
 
-from ..types.events import DataEvent, DataUpdatedEvent
+from ..types import DataEvent, DataUpdatedEvent
+from ._bindable import BindingTarget
 
 
 @runtime_checkable
-class Bound(Protocol):
+class Bound(BindingTarget, Protocol):
     """An abstraction of a readable bound value."""
 
     def events(self) -> AsyncIterable[DataUpdatedEvent]:
@@ -23,7 +24,7 @@ class ReverseBound(Protocol):
     """An abstraction of a settable bound value."""
 
     def set(
-        self, value: Any, source: DataEvent | None = None
+        self, value: Any, source_event: DataEvent | None = None
     ) -> Awaitable[None]:
         """Push a value into the binding."""
 
@@ -31,5 +32,3 @@ class ReverseBound(Protocol):
 @runtime_checkable
 class TwoWayBound(Bound, ReverseBound, Protocol):
     """A combination of :class:`Bound` and :class:`ReverseBound`."""
-
-    pass

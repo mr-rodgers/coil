@@ -16,3 +16,15 @@ class Bindable(Protocol):
     @property
     def __coil_bindings__(self) -> Dict[str, List[DataEventHandler]]:
         """Return a mapping of subscribers"""
+
+
+class BindingTarget(Protocol):
+    """A property that can be bound to."""
+
+    @property
+    def host(self) -> Bindable:
+        """Return a host mapping to the bindable."""
+
+    @property
+    def prop(self) -> str:
+        """The name of the property"""

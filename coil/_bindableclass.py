@@ -8,7 +8,7 @@ from coil.protocols._bound import Bound, TwoWayBound
 from ._bindings import bind
 from ._core import bound_attr_name, notify_subscribers
 from .protocols import Bindable
-from .types.events import DataDeletedEvent, DataUpdatedEvent
+from .types import DataDeletedEvent, DataUpdatedEvent
 
 T = TypeVar("T", bound=type)
 V = TypeVar("V")
@@ -94,12 +94,20 @@ class BindableValue(Generic[V]):
     def __set__(self, obj: Bindable, value: V) -> None:
         setattr(obj, self.private_name, value)
         notify_subscribers(
-            obj, self.name, DataUpdatedEvent(source=None, value=value)
+            obj,
+            self.name,
+            DataUpdatedEvent(
+                source_event=None, value=value, source=self.bind(obj)
+            ),
         )
 
     def __delete__(self, obj: Bindable) -> None:
         delattr(obj, self.private_name)
-        notify_subscribers(obj, self.name, DataDeletedEvent(source=None))
+        notify_subscribers(
+            obj,
+            self.name,
+            DataDeletedEvent(source_event=None, source=self.bind(obj)),
+        )
 
     @overload
     def bind(self, obj: Bindable, *, readonly: Literal[True] = True) -> Bound:

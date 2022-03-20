@@ -22,7 +22,7 @@ class Window:
 
 @bindableclass
 class Box:
-    value: int
+    value: BindableValue[int]
 
 
 @pytest.fixture

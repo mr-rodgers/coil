@@ -1,12 +1,15 @@
 import asyncio
+from logging import getLogger
+from pprint import pformat
 from typing import Any, Tuple, TypeAlias
 
 from aiostream import stream
 
 from coil.protocols import Bindable, Bound, DataEventHandler, ReverseBound
-from coil.types import DataEvent
+from coil.types import DataEvent, get_event_type
 
 SubscriptionHandle: TypeAlias = Tuple[str, int]
+LOG = getLogger("coil")
 
 
 def bound_attr_name(name: str) -> str:
@@ -43,11 +46,33 @@ def drop_subscription(bindable: Bindable, handle: SubscriptionHandle) -> None:
 def notify_subscribers(
     bindable: Bindable, prop: str, event: DataEvent
 ) -> None:
+    if _is_cyclic_trigger(event):
+        LOG.warning(
+            "Event has a cyclic trigger. "
+            f"It will not be propagated:\n{pformat(event)}"
+        )
+        return
+
     for receive in bindable.__coil_bindings__.get(prop, []):
         try:
             receive(event)
         except Exception:
             continue
+
+
+def _is_cyclic_trigger(event: DataEvent) -> bool:
+    orig_source_obj = (event["source"].host, event["source"].prop)
+    orig_event_type = get_event_type(event)
+
+    while event["source_event"] is not None:
+        event = event["source_event"]
+        if (
+            orig_source_obj == (event["source"].host, event["source"].prop)
+            and get_event_type(event) == orig_event_type
+        ):
+            return True
+    else:
+        return False
 
 
 def tail(bound: Bound, *, into: ReverseBound) -> asyncio.Task[None]:
@@ -66,6 +91,6 @@ def tail(bound: Bound, *, into: ReverseBound) -> asyncio.Task[None]:
 async def _tail(events_stream: Any, into: ReverseBound) -> None:
     async with events_stream.stream() as streamer:
         async for event in streamer:
-            await into.set(event["value"], source=event)
+            await into.set(event["value"], source_event=event)
 
         # fixme: if the stream is exhausted, the field was deleted
