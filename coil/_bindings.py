@@ -112,13 +112,15 @@ def bind(
 def bind(target: Tuple[Bindable, str], *, readonly: bool = True) -> Any:
     """Return a binding for the given target
 
-    :param target: A tuple representing a :class:`protocols.Bindable`
-      and attribute combination.
-    :param readonly: Controls what you are able to do with the returned
-      binding; this is `True` be default, meaning that the returned
-      binding can only be used to watch for changes to the bound
-      value. When this is set to `False`, the returned binding can also
-      be used to set the bound value.
+    Args:
+        target (coil.protocols.Bindable): A tuple representing a
+            [`protocols.Bindable`][coil.protocols.Bindable]
+            and attribute combination.
+        readonly: Controls what you are able to do with the returned
+                  binding; this is `True` be default, meaning that the returned
+                  binding can only be used to watch for changes to the bound
+                  value. When this is set to `False`, the returned binding can
+                  also be used to set the bound value.
     """
     (host, prop) = target
     return Binding(host, prop) if readonly else TwoWayBinding(host, prop)

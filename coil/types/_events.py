@@ -8,26 +8,35 @@ if TYPE_CHECKING:
 
 
 class DataEvent(TypedDict):
-    """A :class:`typed dict <typing.TypedDict>` representing
-    a data-event generated from a bound value.
+    """A typed dict representing a data-event generated from a bound value.
 
-    :class:`DataUpdatedEvent` and :class:`DataDeletedEvent` are
+    [`DataUpdatedEvent`][coil.types.DataUpdatedEvent] and
+    [`DataDeletedEvent`][coil.types.DataDeletedEvent] are
     both variants of this.
 
     They are typically yielded from
-    :meth:`protocols.Bound.events(...) <coil.protocols.Bound.events>`.
+    [`protocols.Bound.events(...)`][coil.protocols.Bound.events].
 
     Data events may provide the following fields:
 
-    :source: this is always present, but may be :code:`None`. When present,
-        it will point to another :class:`DataEvent` which this event was
-        generated from inside.
-    :value: this is only present in :class:`DataUpdatedEvent` dicts.
+    `source`
+    :   This is always present, and refers to the
+        [`BindingTarget`][coil.protocols.BindingTarget] that generated
+        the event.
+
+    `source_event`
+    :   This is always present, but may be `None`. When present,
+        it will point to another [`DataEvent`][coil.types.DataEvent]
+        which this event was generated from inside.
+
+    `value`
+    :   This is only present in
+        [`DataUpdatedEvent`][coil.types.DataUpdatedEvent] dicts.
 
 
     It is important to bear in mind that these are dictionaries, and not
     objects. In other words, you can retrieve an event's source using
-    :code:`event["source_event"]`, but not with :code:`event.source_event`.
+    `event["source_event"]`, but not with `event.source_event`.
     """
 
     source_event: Any

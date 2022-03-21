@@ -9,7 +9,7 @@ class Bindable(Protocol):
     properties.
 
     This protocol is implemented by any class that is decorated
-    with :func:`bindableclass <coil.bindableclass>` (even though
+    with [`bindableclass`][coil.bindableclass] (even though
     this currently fails mypy typecheck).
     """
 

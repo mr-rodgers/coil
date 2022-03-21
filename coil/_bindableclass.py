@@ -30,11 +30,12 @@ def override_init(cls: T) -> None:
 
 
 def bindableclass(cls: T) -> T:
-    """Decorate a class as :class:`coil.protocols.Bindable`.
+    """Decorate a class as [coil.protocols.Bindable][].
 
     This enables to bind to the classes' declared properties
-    using instances of this class (either using :func:`bind` or
-    :meth:`BindableValue.bind`)::
+    using instances of this class (either using [coil.bind][] or
+    [coil.BindableValue.bind][]):
+
 
         @bindableclass
         class Box:
@@ -54,15 +55,15 @@ def bindableclass(cls: T) -> T:
 class BindableValue(Generic[V]):
     """
     A descriptor which allows to track changes on a
-    :class:`coil.protocols.Bindable`.
+    [coil.protocols.Bindable][].
 
     You typically do not need to instantiate one of these
-    yourself; classes decorated with :func:`bindableclass`
+    yourself; classes decorated with [coil.bindableclass][]
     will have all of their declared properties turned into
     one of these.
 
     These also provide an alternative syntax for creating
-    data bindings::
+    data bindings.
 
         >>> @bindableclass
         ... class Box:
@@ -72,6 +73,7 @@ class BindableValue(Generic[V]):
         >>> bound_value = Box.value.bind(box)
         >>> bound_value.events()
         <BindingEventStream bindable=Box(value=1), prop='value'>
+
     """
 
     def __init__(self, name: str):
@@ -173,7 +175,7 @@ class BindableValue(Generic[V]):
         """Get a binding for this value on a given object.
 
         Short hand for
-        :func:`bind((obj, attr), readonly=readonly) <coil.bind>`::
+        [`bind((obj, attr), readonly=readonly)`][coil.bind]
 
             from coil import bind, bindableclass
 
@@ -196,38 +198,51 @@ class BindableValue(Generic[V]):
         If you've assigned a bound value to a binding
         target. That means changes to the bound value will be
         propagated to the binding target automatically in the background.
-        This method provides a way to stop this process::
 
-            @coil.bindableclass
-            class Box:
-                value: int
+        This method provides a way to stop this process:
 
-            async with coil.runtime():
-                source = Box(10)
-                target = Box(10)
+        ```python
+        @coil.bindableclass
+        class Box:
+            value: int
 
-                # changes to source.value will be reflected
-                # into target.value
-                target.value = Box.value.bind(source)
+        async with coil.runtime():
+            source = Box(10)
+            target = Box(10)
 
-                # changes to source.value will no longer be
-                # reflected into target.value
-                Box.value.clear_last_binding(assigned_to=target)
+            # changes to source.value will be reflected
+            # into target.value
+            target.value = Box.value.bind(source)
+
+            # changes to source.value will no longer be
+            # reflected into target.value
+            Box.value.clear_last_binding(assigned_to=target)
+        ```
 
         This function is a more readable shorthand for assigning
-        a "self-bind" to the target::
+        a "self-bind" to the target:
 
-            async with coil.runtime():
-               source = Box(10)
-                target = Box(10)
+        ```python
+        async with coil.runtime():
+            source = Box(10)
+            target = Box(10)
 
-                # changes to source.value will be reflected
-                # into target.value
-                target.value = Box.value.bind(source)
+            # changes to source.value will be reflected
+            # into target.value
+            target.value = Box.value.bind(source)
 
-                # changes to source.value will no longer be
-                # reflected into target.value
-                target.value = Box.value.bind(target)
+            # changes to source.value will no longer be
+            # reflected into target.value
+            target.value = Box.value.bind(target)
+        ```
+
+        In both cases, the underlying [coil.tail][]
+        tasks will be cancelled asynchronously, which means you
+        may still receive updates on the bound value for a very short
+        while after calling this. If you would prefer to wait until
+        the updates are guaranteed not to occur before continuing,
+        you should await [coil.Runtime.synchronise][] after calling
+        this.
 
         """
         self._assign_bound_value(assigned_to, self.bind(assigned_to))
