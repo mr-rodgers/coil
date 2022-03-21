@@ -83,11 +83,12 @@ def _is_cyclic_trigger(event: DataEvent) -> bool:
 def tail(bound: Bound, *, into: ReverseBound) -> asyncio.Task[None]:
     """Forward all changes from a bound value into another.
 
-    :param bound: a bound value from which changes can be streamed.
-    :param into: a bound value into which changes can be sent.
-
-    This function returns a cancellable asyncio.Task, which will
+    This function returns a cancellable `asyncio.Task`, which will
     keep running until the bound value is deleted from the host (if ever).
+
+    Args:
+        bound: a bound value from which changes are to be streamed.
+        into: a bound value into which changes are sent
     """
     events_stream = stream.iterate(bound.events())
     return asyncio.create_task(_tail(events_stream, into))

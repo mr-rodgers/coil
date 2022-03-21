@@ -31,4 +31,5 @@ class ReverseBound(Protocol):
 
 @runtime_checkable
 class TwoWayBound(Bound, ReverseBound, Protocol):
-    """A combination of :class:`Bound` and :class:`ReverseBound`."""
+    """A combination of [`Bound`][coil.protocols.Bound] and
+    [`ReverseBound`][coil.protocols.ReverseBound]."""

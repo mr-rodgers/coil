@@ -58,13 +58,16 @@ class Runtime:
     ) -> None:
         """Register a task by an id.
 
-        :param task: an asyncio task to be monitored.
-        :param id: a unique identifier for the task, which can be used to
-                   look it up later with :meth:`find`.
-        :param source: An optional binding to which the id is scoped.
-        :raise ValueError: when another task with the same id / source
-                             combination is already registered.
-        :raise AttributeError: if called outside the Runtime's context manager.
+        Args:
+            task: an asyncio task to be monitored.
+            id: a unique identifier for the task, which can be used to
+                look it up later with :meth:`find`.
+            source: An optional binding to which the id is scoped.
+
+        Exceptions:
+            ValueError: when another task with the same id / source
+                        combination is already registered.
+            AttributeError: if called outside the Runtime's context manager.
 
         """
         task_key = self.__get_task_key(id, source)
@@ -79,7 +82,7 @@ class Runtime:
     def find(
         self, id: str, *, source: BindingMeta | None = None
     ) -> Task[Any] | None:
-        """Retrieve a :meth:`registered <register>` task."""
+        """Retrieve a [`registered`][coil.Runtime.register] task."""
         task_key = self.__get_task_key(id, source)
         return self.__tasks.get(task_key)
 
@@ -88,11 +91,11 @@ class Runtime:
 
         This method first tries to find a registered task using the
         given search parameters. If one is found, then it is
-        :meth:`forgotten <forget>` and then scheduled for cancellation.
+        [`forgotten`][coil.Runtime.forget] and then scheduled for cancellation.
         (Note: cancellation is not immediate and will occur asynchronously;
         if you need to await cancellation, then use a combination of
-        :meth:`find` and :meth:`forget`, while managing the cancellation
-        yourself.)
+        [coil.Runtime.find] and [coil.Runtime.forget], while managing
+        the cancellation yourself.)
 
         If no task is found matching the search parameters, this function
         does nothing.
@@ -147,7 +150,7 @@ class Runtime:
 
 
 def runtime(*, ensure: bool = True) -> Runtime:
-    """Retrieve the currently active :class:`Runtime`.
+    """Retrieve the currently active [coil.Runtime][].
 
     If `ensure=True` (default) and no runtime is currently active,
     a new one is returned, but it is not activated. (Runtimes
@@ -159,9 +162,7 @@ def runtime(*, ensure: bool = True) -> Runtime:
 
     Most applications will only need just one active runtime
     context, so it's best to use this function to wrap your
-    application code at startup
-
-    Example::
+    application code at startup.
 
         import asyncio
         import coil
