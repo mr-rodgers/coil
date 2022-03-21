@@ -1,8 +1,7 @@
 # coil
 
-[![Documentation Status](https://readthedocs.org/projects/coil-bindings/badge/?version=latest)](https://coil-bindings.readthedocs.io/en/latest/?badge=latest)
 
-Documentation is available at [https://coil-bindings.readthedocs.io/](https://coil-bindings.readthedocs.io/)
+Documentation is available at [https://mr-rodgers.github.io/coil/](https://mr-rodgers.github.io/coil/)
 
 ## Usage
 
