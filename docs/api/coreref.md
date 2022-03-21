@@ -7,6 +7,8 @@ coil.
 
 ::: coil.bind
 
+::: coil.tail
+
 ::: coil.BindableValue
 
 ::: coil.runtime
